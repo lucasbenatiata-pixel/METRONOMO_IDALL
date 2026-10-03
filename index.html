@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Metrônomo Idall</title>
+    
+    <!-- Meta tags for PWA & mobile app gallery -->
+    <meta name="theme-color" content="#090d16">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Metrônomo Idall">
+    <meta name="description" content="Metrônomo de alta precisão com design modernista, PWA offline, Setlist de Músicas e ritmos customizáveis.">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyan: {
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                            900: '#164e63',
+                        },
+                        darkBg: '#090d16',
+                        cardBg: 'rgba(17, 24, 39, 0.75)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+                    },
+                    animation: {
+                        'pulse-glow': 'pulseGlow 1.5s infinite alternate',
+                        'beat-pop': 'beatPop 0.15s cubic-bezier(0,1,0.5,1)',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%': { boxShadow: '0 0 15px rgba(6, 182, 212, 0.2)' },
+                            '100%': { boxShadow: '0 0 35px rgba(6, 182, 212, 0.6)' }
+                        },
+                        beatPop: {
+                            '0%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(1.15)' },
+                            '100%': { transform: 'scale(1)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background: radial-gradient(circle at 50% 20%, #151e32 0%, #090d16 80%);
+            min-height: 100vh;
+            color: #f3f4f6;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .glass-panel {
+            background: rgba(18, 26, 43, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .glass-button {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-button:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Modern Range Input Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+            width: 100%;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 10px;
+            cursor: pointer;
+            background: #1e293b;
+            border-radius: 9999px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            height: 26px;
+            width: 26px;
+            border-radius: 50%;
+            background: #06b6d4;
+            box-shadow: 0 0 15px #06b6d4;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -8px;
+            transition: transform 0.1s;
+        }
+
+        input[type=range]::-webkit-slider-thumb:active {
+            transform: scale(1.2);
+            background: #22d3ee;
+        }
+
+        /* Dynamic Beat Indicator Styles */
+        .beat-dot {
+            transition: all 0.08s ease-out;
+        }
+
+        .beat-dot.accent-active {
+            background-color: #22d3ee;
+            box-shadow: 0 0 25px #06b6d4, 0 0 10px #22d3ee;
+            transform: scale(1.25);
+        }
+
+        .beat-dot.normal-active {
+            background-color: #f3f4f6;
+            box-shadow: 0 0 18px rgba(243, 244, 246, 0.8);
+            transform: scale(1.15);
+        }
+
+        /* Pulse Ring for Play Button */
+        .play-ring {
+            box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7);
+            animation: pulseRing 2s infinite cubic-bezier(0.66, 0, 0, 1);
+        }
+
+        @keyframes pulseRing {
+            to {
+                box-shadow: 0 0 0 25px rgba(6, 182, 212, 0);
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body class="font-sans flex flex-col min-h-screen justify-between items-center p-3 sm:p-6 overflow-x-hidden">
+
+    <header class="w-full max-w-lg flex justify-between items-center py-2 px-1 mb-2">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                <i class="fa-solid fa-wave-square text-darkBg font-black text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-cyan-400 bg-clip-text text-transparent">
+                    Metrônomo Idall
+                </h1>
+                <p class="text-xs text-slate-400 font-medium tracking-wide">PRECISÃO DE ESTÚDIO</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <!-- Install PWA Button (Hidden by default, shown when installable) -->
+            <button id="pwaInstallBtn" class="hidden glass-button px-3 py-1.5 rounded-xl text-xs font-semibold text-cyan-400 flex items-center gap-2 border-cyan-500/30 hover:border-cyan-400">
+                <i class="fa-solid fa-download"></i>
+                <span class="hidden sm:inline">Instalar App</span>
+            </button>
+            
+            <!-- Quick Settings Modal Trigger -->
+            <button id="soundSettingsBtn" class="glass-button w-9 h-9 rounded-xl flex items-center justify-center text-slate-300 hover:text-white" title="Som & Preferências">
+                <i class="fa-solid fa-sliders"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="w-full max-w-lg flex-1 flex flex-col justify-center my-auto gap-4">
+
+        <!-- Top Display Card: Visualizer & BPM -->
+        <div class="glass-panel rounded-3xl p-6 text-center relative overflow-hidden flex flex-col items-center justify-center min-h-[190px]">
+            <!-- Accent glow backdrop -->
+            <div id="glowBackdrop" class="absolute -inset-1 bg-gradient-to-r from-cyan-500/10 to-blue-600/10 rounded-3xl blur-2xl transition-opacity opacity-30"></div>
+
+            <!-- Large BPM Display -->
+            <div class="relative z-10 flex items-baseline justify-center gap-2 my-1">
+                <span id="bpmDisplay" class="font-mono text-7xl font-black tracking-tight text-white drop-shadow-md">
+                    120
+                </span>
+                <span class="text-xs font-bold text-slate-400 tracking-wider">BPM</span>
+            </div>
+
+            <!-- Dynamic Beat Visualizer Dots -->
+            <div id="beatVisualizer" class="relative z-10 flex items-center justify-center gap-3 mt-4 flex-wrap max-w-full px-2 min-h-[36px]">
+                <!-- Dots generated dynamically via JS -->
+            </div>
+        </div>
+
+        <!-- BPM Control Sliders & Increment Buttons -->
+        <div class="glass-panel rounded-3xl p-5 sm:p-6 space-y-5">
+            <!-- Fine Adjustment Controls -->
+            <div class="flex items-center justify-between gap-2">
+                <button onclick="adjustBpm(-5)" class="glass-button flex-1 py-3 rounded-2xl text-sm font-bold text-slate-300 hover:text-white hover:bg-white/10 active:scale-95">
+                    -5
+                </button>
+                <button onclick="adjustBpm(-1)" class="glass-button flex-1 py-3 rounded-2xl text-sm font-bold text-slate-300 hover:text-white hover:bg-white/10 active:scale-95">
+                    -1
+                </button>
+                
+                <!-- TAP TEMPO BUTTON -->
+                <button id="tapBtn" class="glass-button px-5 py-3 rounded-2xl text-xs font-black tracking-wider uppercase text-cyan-400 border-cyan-500/30 hover:border-cyan-400 hover:bg-cyan-500/10 active:scale-90 transition-all">
+                    <i class="fa-solid fa-fingerprint mr-1"></i> TAP
+                </button>
+
+                <button onclick="adjustBpm(1)" class="glass-button flex-1 py-3 rounded-2xl text-sm font-bold text-slate-300 hover:text-white hover:bg-white/10 active:scale-95">
+                    +1
+                </button>
+                <button onclick="adjustBpm(5)" class="glass-button flex-1 py-3 rounded-2xl text-sm font-bold text-slate-300 hover:text-white hover:bg-white/10 active:scale-95">
+                    +5
+                </button>
+            </div>
+
+            <!-- Range Slider -->
+            <div class="space-y-1">
+                <div class="flex justify-between text-xs text-slate-400 font-semibold px-1">
+                    <span>30 BPM</span>
+                    <span>150</span>
+                    <span>280 BPM</span>
+                </div>
+                <input id="bpmSlider" type="range" min="30" max="280" value="120" step="1" class="w-full">
+            </div>
+        </div>
+
+        <!-- Time Signature & Subdivisions Grid -->
+        <div class="glass-panel rounded-3xl p-5 space-y-4">
+            <div class="flex items-center justify-between">
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-music text-cyan-400"></i> Fórmulas de Compasso
+                </label>
+                <span id="tsDisplay" class="text-xs font-mono font-bold text-cyan-300 bg-cyan-900/40 px-2 py-0.5 rounded-md">
+                    4 / 4
+                </span>
+            </div>
+
+            <!-- Time Signature Buttons Grid -->
+            <div class="grid grid-cols-4 gap-2">
+                <button onclick="setTimeSignature(2, 4)" class="ts-btn glass-button py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white" data-ts="2/4">2/4</button>
+                <button onclick="setTimeSignature(3, 4)" class="ts-btn glass-button py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white" data-ts="3/4">3/4</button>
+                <button onclick="setTimeSignature(4, 4)" class="ts-btn glass-button py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white" data-ts="4/4">4/4</button>
+                <button onclick="setTimeSignature(5, 4)" class="ts-btn glass-button py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white" data-ts="5/4">5/4</button>
+                
+                <button onclick="setTimeSignature(6, 8)" class="ts-btn glass-button py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white" data-ts="6/8">6/8</button>
+                <button onclick="setTimeSignature(7, 8)" class="ts-btn glass-button py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white" data-ts="7/8">7/8</button>
+                <button onclick="setTimeSignature(9, 8)" class="ts-btn glass-button py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white" data-ts="9/8">9/8</button>
+                <button onclick="setTimeSignature(12, 8)" class="ts-btn glass-button py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white" data-ts="12/8">12/8</button>
+            </div>
+        </div>
+
+        <div class="glass-panel rounded-3xl p-5 space-y-4">
+            <div class="flex items-center justify-between">
+                <label class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-list-ol text-cyan-400"></i> Setlist / Lista de Clicks
+                </label>
+                <button id="addClickBtn" class="glass-button px-3 py-1.5 rounded-xl text-xs font-bold text-cyan-300 border-cyan-500/30 hover:bg-cyan-500/20 flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus text-cyan-400"></i>
+                    <span>Salvar Click Atual</span>
+                </button>
+            </div>
+
+            <!-- Pre-defined Click List Container -->
+            <div id="setlistContainer" class="space-y-2 max-h-52 overflow-y-auto pr-1">
+                <!-- Dynamically rendered setlist items -->
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <!-- Mute / Unmute Quick Toggle -->
+            <button id="muteBtn" class="glass-button w-16 h-16 rounded-2xl flex items-center justify-center text-slate-300 hover:text-white text-xl">
+                <i class="fa-solid fa-volume-high" id="muteIcon"></i>
+            </button>
+
+            <!-- Large Play Toggle Button -->
+            <button id="playBtn" class="flex-1 h-16 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-darkBg font-black text-lg tracking-wider uppercase flex items-center justify-center gap-3 shadow-xl shadow-cyan-500/25 transition-all transform active:scale-95">
+                <i class="fa-solid fa-play text-xl" id="playIcon"></i>
+                <span id="playText">INICIAR</span>
+            </button>
+        </div>
+
+    </main>
+
+    <div id="settingsModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-6 space-y-6 border border-white/10 shadow-2xl transform scale-95 transition-transform duration-300" id="settingsContent">
+            
+            <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-cyan-400"></i> Ajustes de Som & Vibração
+                </h3>
+                <button id="closeSettingsBtn" class="text-slate-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Volume Control -->
+            <div class="space-y-2">
+                <div class="flex justify-between text-xs font-bold text-slate-300">
+                    <span>Volume Principal</span>
+                    <span id="volumeVal">80%</span>
+                </div>
+                <input id="volumeSlider" type="range" min="0" max="100" value="80" class="w-full">
+            </div>
+
+            <!-- Sound Preset Selection -->
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-slate-300">Timbre do Clique</label>
+                <select id="soundPreset" class="w-full bg-slate-900/90 border border-white/10 rounded-xl p-3 text-sm font-semibold text-slate-200 focus:outline-none focus:border-cyan-400">
+                    <option value="digital">Digital Sintético (Agudo Crisp)</option>
+                    <option value="woodblock">Bloco de Madeira (Clássico)</option>
+                    <option value="beep">Beep de Frequência Limpa</option>
+                    <option value="cowbell">Sino Sintético (Pop)</option>
+                </select>
+            </div>
+
+            <!-- Mobile Vibration Option -->
+            <div class="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5">
+                <div>
+                    <p class="text-sm font-bold text-slate-200">Vibração Hática (Celular)</p>
+                    <p class="text-xs text-slate-400">Vibrar dispositivo em cada tempo</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="vibrateToggle" class="sr-only peer">
+                    <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                </label>
+            </div>
+
+            <!-- Volume Boost / Dar um Grau Mode -->
+            <div class="flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+                <div>
+                    <p class="text-sm font-bold text-amber-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-bolt text-amber-400"></i> Tunar Volume (Dar um Grau)
+                    </p>
+                    <p class="text-xs text-slate-400">Ganho duplo (200%) para ensaios barulhentos</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="boostToggle" class="sr-only peer">
+                    <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                </label>
+            </div>
+
+            <!-- Accent Mode -->
+            <div class="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5">
+                <div>
+                    <p class="text-sm font-bold text-slate-200">Acentuar Tempo 1</p>
+                    <p class="text-xs text-slate-400">Tom mais agudo no primeiro tempo</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="accentBeat1Toggle" checked class="sr-only peer">
+                    <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                </label>
+            </div>
+
+            <div class="pt-2">
+                <button id="saveSettingsBtn" class="w-full py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-darkBg font-bold text-sm tracking-wide">
+                    CONCLUÍDO
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Adding Song to Setlist -->
+    <div id="addSongModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-sm rounded-3xl p-6 space-y-4 border border-white/10 shadow-2xl transform scale-95 transition-transform duration-300" id="addSongContent">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-plus text-cyan-400"></i> Salvar Click na Lista
+            </h3>
+            <p class="text-xs text-slate-400">Digite o nome da música ou estilo para salvar na memória.</p>
+            <div>
+                <input type="text" id="songNameInput" placeholder="Ex: Música 1 - Intro" class="w-full bg-slate-900/90 border border-white/10 rounded-xl p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400">
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-2">
+                <button id="cancelAddSongBtn" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Cancelar</button>
+                <button id="confirmAddSongBtn" class="px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-darkBg font-bold text-xs">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="w-full max-w-lg text-center py-3 text-xs text-slate-500 font-semibold tracking-wider">
+        <span>Desenvolvido por LUCAS BENATI</span>
+    </footer>
+
+    <script>
+        // App State
+        let bpm = 120;
+        let beatsPerMeasure = 4;
+        let beatValue = 4; // 4 = quarter note, 8 = eighth note
+        let isPlaying = false;
+        let isMuted = false;
+        let volume = 0.8;
+        let volumeBoost = false;
+        let soundPreset = 'digital';
+        let vibrateEnabled = false;
+        let accentBeat1 = true;
+
+        // Custom Beat Accents Array: 1 = Normal Accent, 2 = Heavy Beat 1, 0 = Muted
+        let beatAccents = [2, 1, 1, 1];
+
+        // Setlist Array State
+        let setlist = [];
+        let activeSongId = null;
+
+        // Web Audio Scheduler State (Lookahead Engine)
+        let audioCtx = null;
+        let currentBeat = 0;
+        let nextNoteTime = 0.0; // Seconds when next note is due
+        const lookahead = 25.0; // Milliseconds timer resolution
+        const scheduleAheadTime = 0.1; // Seconds to look ahead
+        let timerID = null;
+
+        // Tap Tempo Logic
+        let tapTimes = [];
+        const TAP_TIMEOUT = 2500; // Reset tap counter after 2.5s inactivity
+
+        // PWA Install Prompt Deferred Event
+        let deferredPrompt = null;
+
+        function loadSettings() {
+            try {
+                const saved = localStorage.getItem('metronomo_idall_settings');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    if (data.bpm) bpm = data.bpm;
+                    if (data.beatsPerMeasure) beatsPerMeasure = data.beatsPerMeasure;
+                    if (data.beatValue) beatValue = data.beatValue;
+                    if (data.volume !== undefined) volume = data.volume;
+                    if (data.volumeBoost !== undefined) volumeBoost = data.volumeBoost;
+                    if (data.soundPreset) soundPreset = data.soundPreset;
+                    if (data.vibrateEnabled !== undefined) vibrateEnabled = data.vibrateEnabled;
+                    if (data.accentBeat1 !== undefined) accentBeat1 = data.accentBeat1;
+                }
+
+                const savedSetlist = localStorage.getItem('metronomo_idall_setlist');
+                if (savedSetlist) {
+                    setlist = JSON.parse(savedSetlist);
+                } else {
+                    // Default initial demo setlist if empty
+                    setlist = [
+                        { id: 1, name: "Música 1 - Pop Rock", bpm: 120, beatsPerMeasure: 4, beatValue: 4 },
+                        { id: 2, name: "Música 2 - Valsa / Balada", bpm: 90, beatsPerMeasure: 3, beatValue: 4 },
+                        { id: 3, name: "Música 3 - Rápida", bpm: 145, beatsPerMeasure: 6, beatValue: 8 }
+                    ];
+                    saveSetlist();
+                }
+            } catch (e) {
+                console.warn('LocalStorage error:', e);
+            }
+        }
+
+        function saveSettings() {
+            try {
+                const data = {
+                    bpm,
+                    beatsPerMeasure,
+                    beatValue,
+                    volume,
+                    volumeBoost,
+                    soundPreset,
+                    vibrateEnabled,
+                    accentBeat1
+                };
+                localStorage.setItem('metronomo_idall_settings', JSON.stringify(data));
+            } catch (e) {
+                console.warn('LocalStorage save failed:', e);
+            }
+        }
+
+        function saveSetlist() {
+            try {
+                localStorage.setItem('metronomo_idall_setlist', JSON.stringify(setlist));
+            } catch (e) {
+                console.warn('Setlist LocalStorage save failed:', e);
+            }
+        }
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContextClass();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playClick(time, beatIndex) {
+            if (isMuted) return;
+
+            const isBeat1 = (beatIndex === 0);
+            const accentStatus = beatAccents[beatIndex] !== undefined ? beatAccents[beatIndex] : 1;
+
+            if (accentStatus === 0) return; // Muted beat
+
+            const masterGain = audioCtx.createGain();
+            // Tunar volume option applies a x2 multiplier to gain (Dar um Grau)
+            const effectiveVolume = volume * (volumeBoost ? 2.0 : 1.0);
+            masterGain.gain.value = effectiveVolume;
+            masterGain.connect(audioCtx.destination);
+
+            const osc = audioCtx.createOscillator();
+            const noteGain = audioCtx.createGain();
+
+            osc.connect(noteGain);
+            noteGain.connect(masterGain);
+
+            // Pitch & Sound synthesis according to preset
+            if (soundPreset === 'digital') {
+                osc.type = 'sine';
+                if (isBeat1 && accentBeat1) {
+                    osc.frequency.setValueAtTime(1400, time);
+                    noteGain.gain.setValueAtTime(1.0, time);
+                    noteGain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+                } else {
+                    osc.frequency.setValueAtTime(800, time);
+                    noteGain.gain.setValueAtTime(0.6, time);
+                    noteGain.gain.exponentialRampToValueAtTime(0.001, time + 0.04);
+                }
+                osc.start(time);
+                osc.stop(time + 0.06);
+
+            } else if (soundPreset === 'woodblock') {
+                osc.type = 'triangle';
+                if (isBeat1 && accentBeat1) {
+                    osc.frequency.setValueAtTime(1200, time);
+                    osc.frequency.exponentialRampToValueAtTime(600, time + 0.03);
+                    noteGain.gain.setValueAtTime(1.0, time);
+                    noteGain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+                } else {
+                    osc.frequency.setValueAtTime(800, time);
+                    osc.frequency.exponentialRampToValueAtTime(400, time + 0.03);
+                    noteGain.gain.setValueAtTime(0.6, time);
+                    noteGain.gain.exponentialRampToValueAtTime(0.001, time + 0.04);
+                }
+                osc.start(time);
+                osc.stop(time + 0.06);
+
+            } else if (soundPreset === 'beep') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(isBeat1 && accentBeat1 ? 1760 : 880, time);
+                noteGain.gain.setValueAtTime(0.8, time);
+                noteGain.gain.linearRampToValueAtTime(0.001, time + 0.04);
+                osc.start(time);
+                osc.stop(time + 0.05);
+
+            } else if (soundPreset === 'cowbell') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(isBeat1 && accentBeat1 ? 1000 : 600, time);
+                noteGain.gain.setValueAtTime(0.7, time);
+                noteGain.gain.exponentialRampToValueAtTime(0.001, time + 0.08);
+                osc.start(time);
+                osc.stop(time + 0.09);
+            }
+        }
+
+        function nextNote() {
+            const secondsPerBeat = (60.0 / bpm) * (4.0 / beatValue);
+            nextNoteTime += secondsPerBeat;
+            currentBeat = (currentBeat + 1) % beatsPerMeasure;
+        }
+
+        function scheduler() {
+            while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
+                scheduleNote(currentBeat, nextNoteTime);
+                nextNote();
+            }
+            timerID = setTimeout(scheduler, lookahead);
+        }
+
+        function scheduleNote(beat, time) {
+            playClick(time, beat);
+
+            const delayMs = Math.max(0, (time - audioCtx.currentTime) * 1000);
+            setTimeout(() => {
+                highlightBeatVisualizer(beat);
+                if (vibrateEnabled && navigator.vibrate) {
+                    navigator.vibrate(beat === 0 ? 35 : 15);
+                }
+            }, delayMs);
+        }
+
+        function startClick() {
+            initAudio();
+            if (!isPlaying) {
+                isPlaying = true;
+                currentBeat = 0;
+                nextNoteTime = audioCtx.currentTime + 0.02;
+                scheduler();
+                updatePlayButtonUI();
+            }
+        }
+
+        function stopClick() {
+            if (isPlaying) {
+                isPlaying = false;
+                clearTimeout(timerID);
+                updatePlayButtonUI();
+                resetBeatVisualizer();
+            }
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                stopClick();
+            } else {
+                startClick();
+            }
+        }
+
+        function updatePlayButtonUI() {
+            const playBtn = document.getElementById('playBtn');
+            const playIcon = document.getElementById('playIcon');
+            const playText = document.getElementById('playText');
+            const glowBackdrop = document.getElementById('glowBackdrop');
+
+            if (isPlaying) {
+                playBtn.classList.remove('from-cyan-500', 'to-blue-600');
+                playBtn.classList.add('from-red-500', 'to-rose-600', 'shadow-rose-500/30', 'play-ring');
+                playIcon.className = 'fa-solid fa-square text-xl';
+                playText.textContent = 'PARAR';
+                glowBackdrop.classList.remove('opacity-30');
+                glowBackdrop.classList.add('opacity-80');
+            } else {
+                playBtn.classList.remove('from-red-500', 'to-rose-600', 'shadow-rose-500/30', 'play-ring');
+                playBtn.classList.add('from-cyan-500', 'to-blue-600');
+                playIcon.className = 'fa-solid fa-play text-xl';
+                playText.textContent = 'INICIAR';
+                glowBackdrop.classList.remove('opacity-80');
+                glowBackdrop.classList.add('opacity-30');
+            }
+        }
+
+        function renderBeatVisualizer() {
+            const container = document.getElementById('beatVisualizer');
+            container.innerHTML = '';
+
+            if (beatAccents.length !== beatsPerMeasure) {
+                beatAccents = Array.from({ length: beatsPerMeasure }, (_, i) => (i === 0 ? 2 : 1));
+            }
+
+            for (let i = 0; i < beatsPerMeasure; i++) {
+                const dot = document.createElement('button');
+                dot.id = `beat-dot-${i}`;
+                dot.className = 'beat-dot h-7 w-7 sm:h-9 sm:w-9 rounded-2xl flex items-center justify-center font-mono text-xs font-black transition-all bg-slate-800/80 border border-white/10 text-slate-400 hover:border-cyan-400';
+                dot.textContent = i + 1;
+
+                dot.onclick = () => {
+                    beatAccents[i] = (beatAccents[i] + 1) % 3;
+                    updateBeatDotStyle(dot, i);
+                };
+
+                updateBeatDotStyle(dot, i);
+                container.appendChild(dot);
+            }
+        }
+
+        function updateBeatDotStyle(dot, index) {
+            const state = beatAccents[index];
+            dot.classList.remove('border-cyan-400', 'border-rose-400', 'text-cyan-300', 'text-slate-600', 'bg-cyan-950/40');
+            
+            if (state === 2) {
+                dot.classList.add('border-cyan-400', 'text-cyan-300', 'bg-cyan-950/40');
+                dot.title = `Tempo ${index + 1}: Acentuado`;
+            } else if (state === 1) {
+                dot.title = `Tempo ${index + 1}: Normal`;
+            } else {
+                dot.classList.add('text-slate-600', 'beat-dot-muted');
+                dot.title = `Tempo ${index + 1}: Mudo`;
+            }
+        }
+
+        function highlightBeatVisualizer(beatIndex) {
+            for (let i = 0; i < beatsPerMeasure; i++) {
+                const dot = document.getElementById(`beat-dot-${i}`);
+                if (!dot) continue;
+
+                if (i === beatIndex) {
+                    const isBeat1 = (i === 0 && accentBeat1);
+                    dot.classList.add(isBeat1 ? 'accent-active' : 'normal-active', 'animate-beat-pop');
+                } else {
+                    dot.classList.remove('accent-active', 'normal-active', 'animate-beat-pop');
+                }
+            }
+        }
+
+        function resetBeatVisualizer() {
+            for (let i = 0; i < beatsPerMeasure; i++) {
+                const dot = document.getElementById(`beat-dot-${i}`);
+                if (dot) dot.classList.remove('accent-active', 'normal-active', 'animate-beat-pop');
+            }
+        }
+
+        function renderSetlist() {
+            const container = document.getElementById('setlistContainer');
+            container.innerHTML = '';
+
+            if (setlist.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-6 text-slate-500 text-xs italic">
+                        Nenhum click salvo na lista. Clique em "+ Salvar Click Atual" acima!
+                    </div>
+                `;
+                return;
+            }
+
+            setlist.forEach((item) => {
+                const row = document.createElement('div');
+                const isActive = activeSongId === item.id;
+
+                row.className = `group flex items-center justify-between p-3 rounded-2xl border transition-all cursor-pointer ${
+                    isActive 
+                        ? 'bg-cyan-950/50 border-cyan-400/80 shadow-lg shadow-cyan-500/10' 
+                        : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/20'
+                }`;
+
+                row.innerHTML = `
+                    <div class="flex items-center gap-3 flex-1 min-w-0" onclick="selectAndPlayClick(${item.id})">
+                        <div class="w-8 h-8 rounded-xl ${isActive ? 'bg-cyan-500 text-darkBg' : 'bg-slate-800 text-cyan-400'} flex items-center justify-center font-bold text-xs flex-shrink-0">
+                            <i class="fa-solid ${isActive && isPlaying ? 'fa-volume-high animate-pulse' : 'fa-play'}"></i>
+                        </div>
+                        <div class="truncate">
+                            <h4 class="text-xs font-bold ${isActive ? 'text-cyan-300' : 'text-slate-200'} truncate">${item.name}</h4>
+                            <p class="text-[10px] font-mono font-semibold ${isActive ? 'text-cyan-200/80' : 'text-slate-400'}">
+                                ${item.bpm} BPM · ${item.beatsPerMeasure}/${item.beatValue}
+                            </p>
+                        </div>
+                    </div>
+                    <button onclick="removeSetlistItem(event, ${item.id})" class="glass-button w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border-transparent hover:border-rose-500/30 flex-shrink-0" title="Remover da lista">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                `;
+
+                container.appendChild(row);
+            });
+        }
+
+        function selectAndPlayClick(id) {
+            const item = setlist.find(s => s.id === id);
+            if (!item) return;
+
+            activeSongId = item.id;
+            
+            // Apply parameters
+            bpm = item.bpm;
+            beatsPerMeasure = item.beatsPerMeasure;
+            beatValue = item.beatValue;
+            beatAccents = Array.from({ length: beatsPerMeasure }, (_, i) => (i === 0 ? 2 : 1));
+
+            renderBeatVisualizer();
+            updateDisplay();
+            renderSetlist();
+
+            // Enable Click immediately upon selecting song
+            startClick();
+        }
+
+        function removeSetlistItem(event, id) {
+            event.stopPropagation(); // Avoid triggering selectAndPlayClick
+            setlist = setlist.filter(item => item.id !== id);
+            if (activeSongId === id) {
+                activeSongId = null;
+            }
+            saveSetlist();
+            renderSetlist();
+        }
+
+        function openAddSongModal() {
+            const modal = document.getElementById('addSongModal');
+            const content = document.getElementById('addSongContent');
+            const input = document.getElementById('songNameInput');
+
+            input.value = `Música ${setlist.length + 1} - ${bpm} BPM (${beatsPerMeasure}/${beatValue})`;
+            
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+            
+            setTimeout(() => input.focus(), 150);
+        }
+
+        function closeAddSongModal() {
+            const modal = document.getElementById('addSongModal');
+            const content = document.getElementById('addSongContent');
+            
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+        }
+
+        function saveCurrentClick() {
+            const input = document.getElementById('songNameInput');
+            const name = input.value.trim() || `Música - ${bpm} BPM`;
+
+            const newItem = {
+                id: Date.now(),
+                name,
+                bpm,
+                beatsPerMeasure,
+                beatValue
+            };
+
+            setlist.push(newItem);
+            activeSongId = newItem.id;
+            saveSetlist();
+            renderSetlist();
+            closeAddSongModal();
+        }
+
+        function updateDisplay() {
+            document.getElementById('bpmDisplay').textContent = bpm;
+            document.getElementById('bpmSlider').value = bpm;
+            document.getElementById('tsDisplay').textContent = `${beatsPerMeasure} / ${beatValue}`;
+
+            document.querySelectorAll('.ts-btn').forEach(btn => {
+                const key = `${beatsPerMeasure}/${beatValue}`;
+                if (btn.dataset.ts === key) {
+                    btn.classList.add('bg-cyan-500/20', 'border-cyan-400', 'text-cyan-300');
+                    btn.classList.remove('text-slate-300');
+                } else {
+                    btn.classList.remove('bg-cyan-500/20', 'border-cyan-400', 'text-cyan-300');
+                    btn.classList.add('text-slate-300');
+                }
+            });
+
+            saveSettings();
+        }
+
+        function adjustBpm(delta) {
+            setBpm(bpm + delta);
+        }
+
+        function setBpm(val) {
+            bpm = Math.min(280, Math.max(30, parseInt(val)));
+            updateDisplay();
+        }
+
+        function setTimeSignature(num, den) {
+            beatsPerMeasure = num;
+            beatValue = den;
+            beatAccents = Array.from({ length: beatsPerMeasure }, (_, i) => (i === 0 ? 2 : 1));
+            renderBeatVisualizer();
+            updateDisplay();
+        }
+
+        function handleTap() {
+            const now = performance.now();
+            if (tapTimes.length > 0 && (now - tapTimes[tapTimes.length - 1]) > TAP_TIMEOUT) {
+                tapTimes = [];
+            }
+
+            tapTimes.push(now);
+
+            if (tapTimes.length >= 2) {
+                let totalInterval = 0;
+                for (let i = 1; i < tapTimes.length; i++) {
+                    totalInterval += (tapTimes[i] - tapTimes[i - 1]);
+                }
+                const avgInterval = totalInterval / (tapTimes.length - 1);
+                const calculatedBpm = Math.round(60000 / avgInterval);
+
+                if (calculatedBpm >= 30 && calculatedBpm <= 280) {
+                    setBpm(calculatedBpm);
+                }
+            }
+
+            const tapBtn = document.getElementById('tapBtn');
+            tapBtn.classList.add('scale-95', 'bg-cyan-500/30');
+            setTimeout(() => tapBtn.classList.remove('scale-95', 'bg-cyan-500/30'), 100);
+        }
+
+        function setupModal() {
+            const modal = document.getElementById('settingsModal');
+            const modalContent = document.getElementById('settingsContent');
+            const openBtn = document.getElementById('soundSettingsBtn');
+            const closeBtn = document.getElementById('closeSettingsBtn');
+            const saveBtn = document.getElementById('saveSettingsBtn');
+
+            const openModal = () => {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            };
+
+            const closeModal = () => {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                modalContent.classList.remove('scale-100');
+                modalContent.classList.add('scale-95');
+            };
+
+            openBtn.onclick = openModal;
+            closeBtn.onclick = closeModal;
+            saveBtn.onclick = closeModal;
+            modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+
+            const volumeSlider = document.getElementById('volumeSlider');
+            const volumeVal = document.getElementById('volumeVal');
+            const soundPresetSelect = document.getElementById('soundPreset');
+            const vibrateToggle = document.getElementById('vibrateToggle');
+            const boostToggle = document.getElementById('boostToggle');
+            const accentBeat1Toggle = document.getElementById('accentBeat1Toggle');
+
+            volumeSlider.value = volume * 100;
+            volumeVal.textContent = volumeBoost ? `${Math.round(volume * 100)}% (+BOOST)` : `${Math.round(volume * 100)}%`;
+            soundPresetSelect.value = soundPreset;
+            vibrateToggle.checked = vibrateEnabled;
+            boostToggle.checked = volumeBoost;
+            accentBeat1Toggle.checked = accentBeat1;
+
+            volumeSlider.oninput = (e) => {
+                volume = e.target.value / 100;
+                volumeVal.textContent = volumeBoost ? `${e.target.value}% (+BOOST)` : `${e.target.value}%`;
+                saveSettings();
+            };
+
+            boostToggle.onchange = (e) => {
+                volumeBoost = e.target.checked;
+                volumeVal.textContent = volumeBoost ? `${Math.round(volume * 100)}% (+BOOST)` : `${Math.round(volume * 100)}%`;
+                saveSettings();
+            };
+
+            soundPresetSelect.onchange = (e) => {
+                soundPreset = e.target.value;
+                saveSettings();
+            };
+
+            vibrateToggle.onchange = (e) => {
+                vibrateEnabled = e.target.checked;
+                saveSettings();
+            };
+
+            accentBeat1Toggle.onchange = (e) => {
+                accentBeat1 = e.target.checked;
+                saveSettings();
+            };
+
+            // Setup Add Song Modal Listeners
+            document.getElementById('addClickBtn').onclick = openAddSongModal;
+            document.getElementById('cancelAddSongBtn').onclick = closeAddSongModal;
+            document.getElementById('confirmAddSongBtn').onclick = saveCurrentClick;
+            document.getElementById('songNameInput').onkeydown = (e) => {
+                if (e.key === 'Enter') saveCurrentClick();
+            };
+        }
+
+        function setupPWA() {
+            const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+                <rect width="512" height="512" rx="128" fill="#090d16"/>
+                <circle cx="256" cy="256" r="200" fill="#151e32" stroke="#06b6d4" stroke-width="12"/>
+                <path d="M256 100 L320 380 L192 380 Z" fill="#06b6d4"/>
+                <circle cx="256" cy="380" r="24" fill="#22d3ee"/>
+                <path d="M120 256 Q 256 180 392 256" stroke="#22d3ee" stroke-width="16" stroke-linecap="round"/>
+            </svg>`;
+
+            const iconBlob = new Blob([svgIcon], { type: 'image/svg+xml' });
+            const iconUrl = URL.createObjectURL(iconBlob);
+
+            const manifestObj = {
+                name: "Metrônomo Idall",
+                short_name: "Idall",
+                start_url: "./",
+                display: "standalone",
+                background_color: "#090d16",
+                theme_color: "#090d16",
+                icons: [
+                    {
+                        src: iconUrl,
+                        sizes: "512x512",
+                        type: "image/svg+xml",
+                        purpose: "any maskable"
+                    }
+                ]
+            };
+
+            const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/json' });
+            const manifestUrl = URL.createObjectURL(manifestBlob);
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = manifestUrl;
+            document.head.appendChild(link);
+
+            if ('serviceWorker' in navigator) {
+                const swScript = `
+                    const CACHE_NAME = 'metronomo-idall-v2';
+                    self.addEventListener('install', (e) => {
+                        e.waitUntil(
+                            caches.open(CACHE_NAME).then((cache) => {
+                                return cache.addAll(['./']);
+                            })
+                        );
+                        self.skipWaiting();
+                    });
+                    self.addEventListener('fetch', (e) => {
+                        e.respondWith(
+                            caches.match(e.request).then((res) => res || fetch(e.request))
+                        );
+                    });
+                `;
+                const swBlob = new Blob([swScript], { type: 'text/javascript' });
+                const swUrl = URL.createObjectURL(swBlob);
+
+                navigator.serviceWorker.register(swUrl).then(() => {
+                    console.log('Metrônomo Idall: SW registrado.');
+                }).catch(err => console.log('SW Reg:', err));
+            }
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                const pwaBtn = document.getElementById('pwaInstallBtn');
+                pwaBtn.classList.remove('hidden');
+
+                pwaBtn.onclick = () => {
+                    pwaBtn.classList.add('hidden');
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('App instalado!');
+                        }
+                        deferredPrompt = null;
+                    });
+                };
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+
+            const bpmSlider = document.getElementById('bpmSlider');
+            bpmSlider.addEventListener('input', (e) => setBpm(e.target.value));
+
+            document.getElementById('playBtn').addEventListener('click', togglePlay);
+            document.getElementById('tapBtn').addEventListener('click', handleTap);
+
+            const muteBtn = document.getElementById('muteBtn');
+            const muteIcon = document.getElementById('muteIcon');
+            muteBtn.addEventListener('click', () => {
+                isMuted = !isMuted;
+                if (isMuted) {
+                    muteIcon.className = 'fa-solid fa-volume-xmark text-red-400';
+                    muteBtn.classList.add('border-red-500/40');
+                } else {
+                    muteIcon.className = 'fa-solid fa-volume-high';
+                    muteBtn.classList.remove('border-red-500/40');
+                }
+            });
+
+            window.addEventListener('keydown', (e) => {
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    togglePlay();
+                }
+            });
+
+            renderBeatVisualizer();
+            renderSetlist();
+            updateDisplay();
+            setupModal();
+            setupPWA();
+        });
+    </script>
+</body>
+</html>
