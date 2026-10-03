@@ -10,75 +10,68 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Metrônomo Idall">
-    <meta name="description" content="Metrônomo de alta precisão com design modernista, PWA offline, Setlist de Músicas e ritmos customizáveis.">
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        cyan: {
-                            400: '#22d3ee',
-                            500: '#06b6d4',
-                            900: '#164e63',
-                        },
-                        darkBg: '#090d16',
-                        cardBg: 'rgba(17, 24, 39, 0.75)',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'Fira Code', 'monospace']
-                    },
-                    animation: {
-                        'pulse-glow': 'pulseGlow 1.5s infinite alternate',
-                        'beat-pop': 'beatPop 0.15s cubic-bezier(0,1,0.5,1)',
-                    },
-                    keyframes: {
-                        pulseGlow: {
-                            '0%': { boxShadow: '0 0 15px rgba(6, 182, 212, 0.2)' },
-                            '100%': { boxShadow: '0 0 35px rgba(6, 182, 212, 0.6)' }
-                        },
-                        beatPop: {
-                            '0%': { transform: 'scale(1)' },
-                            '50%': { transform: 'scale(1.15)' },
-                            '100%': { transform: 'scale(1)' }
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+    <meta name="description" content="Metrônomo de alta precisão com design modernista 100% offline, PWA, Setlist e ritmos customizáveis.">
 
     <style>
+        /* 100% Self-Contained Modernist Styles (Zero External Dependencies) */
+        :root {
+            --bg-dark: #090d16;
+            --card-bg: rgba(18, 26, 43, 0.7);
+            --cyan-primary: #06b6d4;
+            --cyan-bright: #22d3ee;
+            --cyan-dark: #164e63;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --amber-bright: #f59e0b;
+            --rose-bright: #f43f5e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background: radial-gradient(circle at 50% 20%, #151e32 0%, #090d16 80%);
             min-height: 100vh;
-            color: #f3f4f6;
+            color: var(--text-main);
             user-select: none;
             -webkit-user-select: none;
             touch-action: manipulation;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            overflow-x: hidden;
         }
 
+        /* Glassmorphism Card Style */
         .glass-panel {
-            background: rgba(18, 26, 43, 0.65);
+            background: var(--card-bg);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            width: 100%;
         }
 
         .glass-button {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-main);
+            border-radius: 16px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .glass-button:active {
@@ -86,7 +79,179 @@
             background: rgba(255, 255, 255, 0.12);
         }
 
-        /* Modern Range Input Styling */
+        /* Layout Helpers */
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin: auto 0;
+        }
+
+        header {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 4px;
+        }
+
+        .logo-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #0891b2, #22d3ee);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.35);
+        }
+
+        .brand-title {
+            font-size: 1.15rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #ffffff, #cbd5e1, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+        }
+
+        .brand-sub {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            letter-spacing: 0.08em;
+        }
+
+        /* BPM Display Card */
+        .bpm-card {
+            padding: 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 180px;
+        }
+
+        .glow-backdrop {
+            position: absolute;
+            inset: -10px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.25) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 30px;
+            transition: opacity 0.3s;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .bpm-number {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 4.5rem;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            color: #ffffff;
+            line-height: 1;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        .bpm-unit {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            margin-left: 6px;
+        }
+
+        /* Dynamic Visualizer Dots */
+        .beat-visualizer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+            min-height: 36px;
+        }
+
+        .beat-dot {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            font-family: ui-monospace, monospace;
+            font-size: 0.8rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.08s ease-out;
+        }
+
+        .beat-dot.accent-active {
+            background-color: var(--cyan-bright);
+            box-shadow: 0 0 25px var(--cyan-primary), 0 0 10px var(--cyan-bright);
+            color: var(--bg-dark);
+            transform: scale(1.2);
+        }
+
+        .beat-dot.normal-active {
+            background-color: #ffffff;
+            box-shadow: 0 0 18px rgba(255, 255, 255, 0.8);
+            color: var(--bg-dark);
+            transform: scale(1.12);
+        }
+
+        .beat-dot-accent {
+            border-color: var(--cyan-primary);
+            color: var(--cyan-bright);
+            background: rgba(6, 182, 212, 0.15);
+        }
+
+        .beat-dot-muted {
+            color: #475569;
+            opacity: 0.5;
+        }
+
+        /* Controls Panel */
+        .controls-panel {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .adjust-grid {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .adjust-grid .glass-button {
+            flex: 1;
+            padding: 12px 0;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+        }
+
+        .tap-btn {
+            padding: 12px 16px;
+            font-size: 0.75rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            color: var(--cyan-bright);
+            border-color: rgba(6, 182, 212, 0.3);
+            background: rgba(6, 182, 212, 0.08);
+            gap: 6px;
+        }
+
+        /* Modern Range Input */
         input[type=range] {
             -webkit-appearance: none;
             background: transparent;
@@ -110,8 +275,8 @@
             height: 26px;
             width: 26px;
             border-radius: 50%;
-            background: #06b6d4;
-            box-shadow: 0 0 15px #06b6d4;
+            background: var(--cyan-primary);
+            box-shadow: 0 0 15px var(--cyan-primary);
             cursor: pointer;
             -webkit-appearance: none;
             margin-top: -8px;
@@ -120,219 +285,483 @@
 
         input[type=range]::-webkit-slider-thumb:active {
             transform: scale(1.2);
-            background: #22d3ee;
+            background: var(--cyan-bright);
         }
 
-        /* Dynamic Beat Indicator Styles */
-        .beat-dot {
-            transition: all 0.08s ease-out;
+        /* Time Signature Grid */
+        .ts-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 8px;
         }
 
-        .beat-dot.accent-active {
-            background-color: #22d3ee;
-            box-shadow: 0 0 25px #06b6d4, 0 0 10px #22d3ee;
-            transform: scale(1.25);
+        .ts-btn {
+            padding: 10px 0;
+            font-size: 0.8rem;
+            color: #cbd5e1;
         }
 
-        .beat-dot.normal-active {
-            background-color: #f3f4f6;
-            box-shadow: 0 0 18px rgba(243, 244, 246, 0.8);
-            transform: scale(1.15);
+        .ts-btn.active {
+            background: rgba(6, 182, 212, 0.2);
+            border-color: var(--cyan-primary);
+            color: var(--cyan-bright);
         }
 
-        /* Pulse Ring for Play Button */
-        .play-ring {
-            box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7);
+        /* Setlist Item Style */
+        .setlist-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .setlist-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .setlist-row:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .setlist-row.active {
+            background: rgba(6, 182, 212, 0.15);
+            border-color: rgba(6, 182, 212, 0.5);
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.15);
+        }
+
+        .setlist-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .setlist-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: #1e293b;
+            color: var(--cyan-bright);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .setlist-row.active .setlist-icon {
+            background: var(--cyan-primary);
+            color: var(--bg-dark);
+        }
+
+        .setlist-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .setlist-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .setlist-details {
+            font-size: 0.68rem;
+            font-family: ui-monospace, monospace;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* Main Play Button */
+        .play-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .mute-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            font-size: 1.2rem;
+            color: #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .main-play-btn {
+            flex: 1;
+            height: 60px;
+            border-radius: 18px;
+            background: linear-gradient(90deg, #06b6d4, #2563eb);
+            color: var(--bg-dark);
+            font-size: 1.05rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 10px 25px rgba(6, 182, 212, 0.3);
+            transition: all 0.2s;
+        }
+
+        .main-play-btn:active {
+            transform: scale(0.97);
+        }
+
+        .main-play-btn.playing {
+            background: linear-gradient(90deg, #f43f5e, #e11d48);
+            box-shadow: 0 10px 25px rgba(244, 63, 94, 0.4);
             animation: pulseRing 2s infinite cubic-bezier(0.66, 0, 0, 1);
+            color: #ffffff;
         }
 
         @keyframes pulseRing {
             to {
-                box-shadow: 0 0 0 25px rgba(6, 182, 212, 0);
+                box-shadow: 0 0 0 20px rgba(244, 63, 94, 0);
             }
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
+        /* Modal Overlays */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
         }
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
         }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
+
+        .modal-box {
+            background: rgba(18, 26, 43, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 28px;
+            padding: 24px;
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            transform: scale(0.92);
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 12px;
+        }
+
+        .modal-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .toggle-boost {
+            background: linear-gradient(90deg, rgba(245, 158, 11, 0.12), rgba(234, 88, 12, 0.12));
+            border-color: rgba(245, 158, 11, 0.25);
+        }
+
+        /* Custom Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 26px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider-round {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #334155;
+            transition: .2s;
+            border-radius: 34px;
+        }
+
+        .slider-round:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .2s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider-round {
+            background-color: var(--cyan-primary);
+        }
+
+        input:checked + .slider-boost {
+            background-color: var(--amber-bright);
+        }
+
+        input:checked + .slider-round:before {
+            transform: translateX(20px);
+        }
+
+        .text-input {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            padding: 12px 14px;
+            color: #ffffff;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .text-input:focus {
+            border-color: var(--cyan-primary);
+        }
+
+        select.text-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat;
+            background-position-x: 96%;
+            background-position-y: 50%;
+        }
+
+        footer {
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            padding: 12px 0;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 0.05em;
+        }
+
+        /* Offline Toast Indicator */
+        .offline-status {
+            font-size: 0.65rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
     </style>
 </head>
 
-<body class="font-sans flex flex-col min-h-screen justify-between items-center p-3 sm:p-6 overflow-x-hidden">
+<body>
 
-    <header class="w-full max-w-lg flex justify-between items-center py-2 px-1 mb-2">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-cyan-500/30">
-                <i class="fa-solid fa-wave-square text-darkBg font-black text-lg"></i>
+    <!-- Header Section -->
+    <header>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="logo-box">
+                <!-- Embedded SVG Wave Icon -->
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#090d16" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12h3l3-9 5 18 4-12 2 3h3"/>
+                </svg>
             </div>
             <div>
-                <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-cyan-400 bg-clip-text text-transparent">
-                    Metrônomo Idall
-                </h1>
-                <p class="text-xs text-slate-400 font-medium tracking-wide">PRECISÃO DE ESTÚDIO</p>
+                <div class="brand-title">Metrônomo Idall</div>
+                <div class="brand-sub">PRECISÃO DE ESTÚDIO</div>
             </div>
         </div>
 
-        <div class="flex items-center gap-2">
-            <!-- Install PWA Button (Hidden by default, shown when installable) -->
-            <button id="pwaInstallBtn" class="hidden glass-button px-3 py-1.5 rounded-xl text-xs font-semibold text-cyan-400 flex items-center gap-2 border-cyan-500/30 hover:border-cyan-400">
-                <i class="fa-solid fa-download"></i>
-                <span class="hidden sm:inline">Instalar App</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <!-- PWA Install Button -->
+            <button id="pwaInstallBtn" class="glass-button" style="padding: 6px 12px; font-size: 0.7rem; color: var(--cyan-bright); border-color: rgba(6, 182, 212, 0.3); display: none;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Instalar
             </button>
             
-            <!-- Quick Settings Modal Trigger -->
-            <button id="soundSettingsBtn" class="glass-button w-9 h-9 rounded-xl flex items-center justify-center text-slate-300 hover:text-white" title="Som & Preferências">
-                <i class="fa-solid fa-sliders"></i>
+            <!-- Sound & Preferences Button -->
+            <button id="soundSettingsBtn" class="glass-button" style="width: 38px; height: 38px;" title="Configurações de Som">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
             </button>
         </div>
     </header>
 
-    <main class="w-full max-w-lg flex-1 flex flex-col justify-center my-auto gap-4">
+    <!-- Main Container -->
+    <main class="app-container">
 
         <!-- Top Display Card: Visualizer & BPM -->
-        <div class="glass-panel rounded-3xl p-6 text-center relative overflow-hidden flex flex-col items-center justify-center min-h-[190px]">
-            <!-- Accent glow backdrop -->
-            <div id="glowBackdrop" class="absolute -inset-1 bg-gradient-to-r from-cyan-500/10 to-blue-600/10 rounded-3xl blur-2xl transition-opacity opacity-30"></div>
+        <div class="glass-panel bpm-card">
+            <div id="glowBackdrop" class="glow-backdrop"></div>
 
-            <!-- Large BPM Display -->
-            <div class="relative z-10 flex items-baseline justify-center gap-2 my-1">
-                <span id="bpmDisplay" class="font-mono text-7xl font-black tracking-tight text-white drop-shadow-md">
-                    120
-                </span>
-                <span class="text-xs font-bold text-slate-400 tracking-wider">BPM</span>
+            <div style="display: flex; align-items: baseline; justify-content: center; position: relative; z-index: 2;">
+                <span id="bpmDisplay" class="bpm-number">120</span>
+                <span class="bpm-unit">BPM</span>
             </div>
 
-            <!-- Dynamic Beat Visualizer Dots -->
-            <div id="beatVisualizer" class="relative z-10 flex items-center justify-center gap-3 mt-4 flex-wrap max-w-full px-2 min-h-[36px]">
-                <!-- Dots generated dynamically via JS -->
-            </div>
+            <!-- Dynamic Beat Indicator Dots -->
+            <div id="beatVisualizer" class="beat-visualizer"></div>
         </div>
 
-        <!-- BPM Control Sliders & Increment Buttons -->
-        <div class="glass-panel rounded-3xl p-5 sm:p-6 space-y-5">
-            <!-- Fine Adjustment Controls -->
-            <div class="flex items-center justify-between gap-2">
-                <button onclick="adjustBpm(-5)" class="glass-button flex-1 py-3 rounded-2xl text-sm font-bold text-slate-300 hover:text-white hover:bg-white/10 active:scale-95">
-                    -5
-                </button>
-                <button onclick="adjustBpm(-1)" class="glass-button flex-1 py-3 rounded-2xl text-sm font-bold text-slate-300 hover:text-white hover:bg-white/10 active:scale-95">
-                    -1
-                </button>
+        <!-- BPM Control Sliders & Fine Tuning -->
+        <div class="glass-panel controls-panel">
+            <div class="adjust-grid">
+                <button onclick="adjustBpm(-5)" class="glass-button">-5</button>
+                <button onclick="adjustBpm(-1)" class="glass-button">-1</button>
                 
                 <!-- TAP TEMPO BUTTON -->
-                <button id="tapBtn" class="glass-button px-5 py-3 rounded-2xl text-xs font-black tracking-wider uppercase text-cyan-400 border-cyan-500/30 hover:border-cyan-400 hover:bg-cyan-500/10 active:scale-90 transition-all">
-                    <i class="fa-solid fa-fingerprint mr-1"></i> TAP
+                <button id="tapBtn" class="glass-button tap-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    TAP
                 </button>
 
-                <button onclick="adjustBpm(1)" class="glass-button flex-1 py-3 rounded-2xl text-sm font-bold text-slate-300 hover:text-white hover:bg-white/10 active:scale-95">
-                    +1
-                </button>
-                <button onclick="adjustBpm(5)" class="glass-button flex-1 py-3 rounded-2xl text-sm font-bold text-slate-300 hover:text-white hover:bg-white/10 active:scale-95">
-                    +5
-                </button>
+                <button onclick="adjustBpm(1)" class="glass-button">+1</button>
+                <button onclick="adjustBpm(5)" class="glass-button">+5</button>
             </div>
 
-            <!-- Range Slider -->
-            <div class="space-y-1">
-                <div class="flex justify-between text-xs text-slate-400 font-semibold px-1">
+            <!-- Slider -->
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); font-weight: 700;">
                     <span>30 BPM</span>
                     <span>150</span>
                     <span>280 BPM</span>
                 </div>
-                <input id="bpmSlider" type="range" min="30" max="280" value="120" step="1" class="w-full">
+                <input id="bpmSlider" type="range" min="30" max="280" value="120" step="1">
             </div>
         </div>
 
-        <!-- Time Signature & Subdivisions Grid -->
-        <div class="glass-panel rounded-3xl p-5 space-y-4">
-            <div class="flex items-center justify-between">
-                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                    <i class="fa-solid fa-music text-cyan-400"></i> Fórmulas de Compasso
-                </label>
-                <span id="tsDisplay" class="text-xs font-mono font-bold text-cyan-300 bg-cyan-900/40 px-2 py-0.5 rounded-md">
+        <!-- Time Signatures Card -->
+        <div class="glass-panel" style="padding: 18px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.72rem; font-weight: 800; color: var(--text-muted); letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cyan-bright)" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                    FÓRMULAS DE COMPASSO
+                </span>
+                <span id="tsDisplay" style="font-size: 0.72rem; font-family: monospace; font-weight: 800; color: var(--cyan-bright); background: rgba(6, 182, 212, 0.15); padding: 2px 8px; border-radius: 6px;">
                     4 / 4
                 </span>
             </div>
 
-            <!-- Time Signature Buttons Grid -->
-            <div class="grid grid-cols-4 gap-2">
-                <button onclick="setTimeSignature(2, 4)" class="ts-btn glass-button py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white" data-ts="2/4">2/4</button>
-                <button onclick="setTimeSignature(3, 4)" class="ts-btn glass-button py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white" data-ts="3/4">3/4</button>
-                <button onclick="setTimeSignature(4, 4)" class="ts-btn glass-button py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white" data-ts="4/4">4/4</button>
-                <button onclick="setTimeSignature(5, 4)" class="ts-btn glass-button py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white" data-ts="5/4">5/4</button>
+            <div class="ts-grid">
+                <button onclick="setTimeSignature(2, 4)" class="ts-btn glass-button" data-ts="2/4">2/4</button>
+                <button onclick="setTimeSignature(3, 4)" class="ts-btn glass-button" data-ts="3/4">3/4</button>
+                <button onclick="setTimeSignature(4, 4)" class="ts-btn glass-button" data-ts="4/4">4/4</button>
+                <button onclick="setTimeSignature(5, 4)" class="ts-btn glass-button" data-ts="5/4">5/4</button>
                 
-                <button onclick="setTimeSignature(6, 8)" class="ts-btn glass-button py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white" data-ts="6/8">6/8</button>
-                <button onclick="setTimeSignature(7, 8)" class="ts-btn glass-button py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white" data-ts="7/8">7/8</button>
-                <button onclick="setTimeSignature(9, 8)" class="ts-btn glass-button py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white" data-ts="9/8">9/8</button>
-                <button onclick="setTimeSignature(12, 8)" class="ts-btn glass-button py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white" data-ts="12/8">12/8</button>
+                <button onclick="setTimeSignature(6, 8)" class="ts-btn glass-button" data-ts="6/8">6/8</button>
+                <button onclick="setTimeSignature(7, 8)" class="ts-btn glass-button" data-ts="7/8">7/8</button>
+                <button onclick="setTimeSignature(9, 8)" class="ts-btn glass-button" data-ts="9/8">9/8</button>
+                <button onclick="setTimeSignature(12, 8)" class="ts-btn glass-button" data-ts="12/8">12/8</button>
             </div>
         </div>
 
-        <div class="glass-panel rounded-3xl p-5 space-y-4">
-            <div class="flex items-center justify-between">
-                <label class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                    <i class="fa-solid fa-list-ol text-cyan-400"></i> Setlist / Lista de Clicks
-                </label>
-                <button id="addClickBtn" class="glass-button px-3 py-1.5 rounded-xl text-xs font-bold text-cyan-300 border-cyan-500/30 hover:bg-cyan-500/20 flex items-center gap-1.5">
-                    <i class="fa-solid fa-plus text-cyan-400"></i>
-                    <span>Salvar Click Atual</span>
+        <!-- Setlist / Pre-defined Clicks Manager -->
+        <div class="glass-panel" style="padding: 18px; display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.72rem; font-weight: 800; color: var(--text-muted); letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cyan-bright)" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                    SETLIST / LISTA DE CLICKS
+                </span>
+                <button id="addClickBtn" class="glass-button" style="padding: 5px 10px; font-size: 0.7rem; color: var(--cyan-bright); border-color: rgba(6, 182, 212, 0.3); gap: 4px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Salvar Click Atual
                 </button>
             </div>
 
-            <!-- Pre-defined Click List Container -->
-            <div id="setlistContainer" class="space-y-2 max-h-52 overflow-y-auto pr-1">
-                <!-- Dynamically rendered setlist items -->
+            <div id="setlistContainer" class="setlist-container">
+                <!-- Dynamic setlist items -->
             </div>
         </div>
 
-        <div class="flex items-center gap-4">
-            <!-- Mute / Unmute Quick Toggle -->
-            <button id="muteBtn" class="glass-button w-16 h-16 rounded-2xl flex items-center justify-center text-slate-300 hover:text-white text-xl">
-                <i class="fa-solid fa-volume-high" id="muteIcon"></i>
+        <!-- Mute and Play Bar -->
+        <div class="play-bar">
+            <button id="muteBtn" class="glass-button mute-btn" title="Mutar Áudio">
+                <svg id="muteIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
             </button>
 
-            <!-- Large Play Toggle Button -->
-            <button id="playBtn" class="flex-1 h-16 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-darkBg font-black text-lg tracking-wider uppercase flex items-center justify-center gap-3 shadow-xl shadow-cyan-500/25 transition-all transform active:scale-95">
-                <i class="fa-solid fa-play text-xl" id="playIcon"></i>
+            <button id="playBtn" class="main-play-btn">
+                <svg id="playIcon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                 <span id="playText">INICIAR</span>
             </button>
         </div>
 
     </main>
 
-    <div id="settingsModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="glass-panel w-full max-w-md rounded-3xl p-6 space-y-6 border border-white/10 shadow-2xl transform scale-95 transition-transform duration-300" id="settingsContent">
-            
-            <div class="flex items-center justify-between pb-3 border-b border-white/10">
-                <h3 class="text-base font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-cyan-400"></i> Ajustes de Som & Vibração
-                </h3>
-                <button id="closeSettingsBtn" class="text-slate-400 hover:text-white text-lg">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <!-- Volume Control -->
-            <div class="space-y-2">
-                <div class="flex justify-between text-xs font-bold text-slate-300">
-                    <span>Volume Principal</span>
-                    <span id="volumeVal">80%</span>
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--cyan-bright)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    Ajustes de Som & Vibração
                 </div>
-                <input id="volumeSlider" type="range" min="0" max="100" value="80" class="w-full">
+                <button id="closeSettingsBtn" class="glass-button" style="width: 32px; height: 32px; border: none; font-size: 1.1rem;">&times;</button>
             </div>
 
-            <!-- Sound Preset Selection -->
-            <div class="space-y-2">
-                <label class="text-xs font-bold text-slate-300">Timbre do Clique</label>
-                <select id="soundPreset" class="w-full bg-slate-900/90 border border-white/10 rounded-xl p-3 text-sm font-semibold text-slate-200 focus:outline-none focus:border-cyan-400">
+            <!-- Volume Slider -->
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; color: #e2e8f0;">
+                    <span>Volume Principal</span>
+                    <span id="volumeVal" style="color: var(--cyan-bright);">80%</span>
+                </div>
+                <input id="volumeSlider" type="range" min="0" max="100" value="80">
+            </div>
+
+            <!-- Timbre Selection -->
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 0.75rem; font-weight: 700; color: #e2e8f0;">Timbre do Clique</label>
+                <select id="soundPreset" class="text-input">
                     <option value="digital">Digital Sintético (Agudo Crisp)</option>
                     <option value="woodblock">Bloco de Madeira (Clássico)</option>
                     <option value="beep">Beep de Frequência Limpa</option>
@@ -340,78 +769,84 @@
                 </select>
             </div>
 
-            <!-- Mobile Vibration Option -->
-            <div class="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5">
+            <!-- Tunar Volume (Modo Dar um Grau) -->
+            <div class="toggle-row toggle-boost">
                 <div>
-                    <p class="text-sm font-bold text-slate-200">Vibração Hática (Celular)</p>
-                    <p class="text-xs text-slate-400">Vibrar dispositivo em cada tempo</p>
+                    <div style="font-size: 0.8rem; font-weight: 800; color: #fbbf24; display: flex; align-items: center; gap: 6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        Tunar Volume (Dar um Grau)
+                    </div>
+                    <div style="font-size: 0.68rem; color: #94a3b8;">Ganho duplo (200%) para ensaios barulhentos</div>
                 </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="vibrateToggle" class="sr-only peer">
-                    <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                <label class="switch">
+                    <input type="checkbox" id="boostToggle">
+                    <span class="slider-round slider-boost"></span>
                 </label>
             </div>
 
-            <!-- Volume Boost / Dar um Grau Mode -->
-            <div class="flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+            <!-- Vibration Toggle -->
+            <div class="toggle-row">
                 <div>
-                    <p class="text-sm font-bold text-amber-300 flex items-center gap-1.5">
-                        <i class="fa-solid fa-bolt text-amber-400"></i> Tunar Volume (Dar um Grau)
-                    </p>
-                    <p class="text-xs text-slate-400">Ganho duplo (200%) para ensaios barulhentos</p>
+                    <div style="font-size: 0.8rem; font-weight: 700; color: #e2e8f0;">Vibração Hática</div>
+                    <div style="font-size: 0.68rem; color: #94a3b8;">Vibrar dispositivo em cada tempo</div>
                 </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="boostToggle" class="sr-only peer">
-                    <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                <label class="switch">
+                    <input type="checkbox" id="vibrateToggle">
+                    <span class="slider-round"></span>
                 </label>
             </div>
 
-            <!-- Accent Mode -->
-            <div class="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5">
+            <!-- Accent Beat 1 -->
+            <div class="toggle-row">
                 <div>
-                    <p class="text-sm font-bold text-slate-200">Acentuar Tempo 1</p>
-                    <p class="text-xs text-slate-400">Tom mais agudo no primeiro tempo</p>
+                    <div style="font-size: 0.8rem; font-weight: 700; color: #e2e8f0;">Acentuar Tempo 1</div>
+                    <div style="font-size: 0.68rem; color: #94a3b8;">Tom agudo no primeiro tempo</div>
                 </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="accentBeat1Toggle" checked class="sr-only peer">
-                    <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                <label class="switch">
+                    <input type="checkbox" id="accentBeat1Toggle" checked>
+                    <span class="slider-round"></span>
                 </label>
             </div>
 
-            <div class="pt-2">
-                <button id="saveSettingsBtn" class="w-full py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-darkBg font-bold text-sm tracking-wide">
-                    CONCLUÍDO
-                </button>
-            </div>
+            <button id="saveSettingsBtn" class="main-play-btn" style="height: 46px; font-size: 0.85rem; border-radius: 14px;">
+                CONCLUÍDO
+            </button>
         </div>
     </div>
 
     <!-- Modal for Adding Song to Setlist -->
-    <div id="addSongModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="glass-panel w-full max-w-sm rounded-3xl p-6 space-y-4 border border-white/10 shadow-2xl transform scale-95 transition-transform duration-300" id="addSongContent">
-            <h3 class="text-base font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-plus text-cyan-400"></i> Salvar Click na Lista
-            </h3>
-            <p class="text-xs text-slate-400">Digite o nome da música ou estilo para salvar na memória.</p>
-            <div>
-                <input type="text" id="songNameInput" placeholder="Ex: Música 1 - Intro" class="w-full bg-slate-900/90 border border-white/10 rounded-xl p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400">
+    <div id="addSongModal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 360px;">
+            <div class="modal-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--cyan-bright)" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Salvar Click na Lista
             </div>
-            <div class="flex items-center justify-end gap-2 pt-2">
-                <button id="cancelAddSongBtn" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Cancelar</button>
-                <button id="confirmAddSongBtn" class="px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-darkBg font-bold text-xs">Salvar</button>
+            <p style="font-size: 0.72rem; color: #94a3b8;">Digite o nome da música para salvar o tempo e fórmula atuais.</p>
+            <input type="text" id="songNameInput" placeholder="Ex: Música 1 - Intro" class="text-input">
+            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px;">
+                <button id="cancelAddSongBtn" class="glass-button" style="padding: 8px 14px; font-size: 0.75rem;">Cancelar</button>
+                <button id="confirmAddSongBtn" class="main-play-btn" style="height: 38px; padding: 0 16px; font-size: 0.75rem; border-radius: 12px;">Salvar</button>
             </div>
         </div>
     </div>
 
-    <footer class="w-full max-w-lg text-center py-3 text-xs text-slate-500 font-semibold tracking-wider">
+    <!-- Footer Signature -->
+    <footer>
+        <div style="margin-bottom: 4px;">
+            <span class="offline-status">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                Modo Offline Ativo
+            </span>
+        </div>
         <span>Desenvolvido por LUCAS BENATI</span>
     </footer>
 
+    <!-- App Engine Logic -->
     <script>
-        // App State
+        // Application State
         let bpm = 120;
         let beatsPerMeasure = 4;
-        let beatValue = 4; // 4 = quarter note, 8 = eighth note
+        let beatValue = 4;
         let isPlaying = false;
         let isMuted = false;
         let volume = 0.8;
@@ -420,26 +855,22 @@
         let vibrateEnabled = false;
         let accentBeat1 = true;
 
-        // Custom Beat Accents Array: 1 = Normal Accent, 2 = Heavy Beat 1, 0 = Muted
         let beatAccents = [2, 1, 1, 1];
-
-        // Setlist Array State
         let setlist = [];
         let activeSongId = null;
 
-        // Web Audio Scheduler State (Lookahead Engine)
+        // Web Audio API Lookahead Scheduler
         let audioCtx = null;
         let currentBeat = 0;
-        let nextNoteTime = 0.0; // Seconds when next note is due
-        const lookahead = 25.0; // Milliseconds timer resolution
-        const scheduleAheadTime = 0.1; // Seconds to look ahead
+        let nextNoteTime = 0.0;
+        const lookahead = 25.0; // ms
+        const scheduleAheadTime = 0.1; // seconds
         let timerID = null;
 
         // Tap Tempo Logic
         let tapTimes = [];
-        const TAP_TIMEOUT = 2500; // Reset tap counter after 2.5s inactivity
+        const TAP_TIMEOUT = 2500;
 
-        // PWA Install Prompt Deferred Event
         let deferredPrompt = null;
 
         function loadSettings() {
@@ -461,7 +892,6 @@
                 if (savedSetlist) {
                     setlist = JSON.parse(savedSetlist);
                 } else {
-                    // Default initial demo setlist if empty
                     setlist = [
                         { id: 1, name: "Música 1 - Pop Rock", bpm: 120, beatsPerMeasure: 4, beatValue: 4 },
                         { id: 2, name: "Música 2 - Valsa / Balada", bpm: 90, beatsPerMeasure: 3, beatValue: 4 },
@@ -488,7 +918,7 @@
                 };
                 localStorage.setItem('metronomo_idall_settings', JSON.stringify(data));
             } catch (e) {
-                console.warn('LocalStorage save failed:', e);
+                console.warn('LocalStorage save error:', e);
             }
         }
 
@@ -496,7 +926,7 @@
             try {
                 localStorage.setItem('metronomo_idall_setlist', JSON.stringify(setlist));
             } catch (e) {
-                console.warn('Setlist LocalStorage save failed:', e);
+                console.warn('Setlist save error:', e);
             }
         }
 
@@ -515,11 +945,9 @@
 
             const isBeat1 = (beatIndex === 0);
             const accentStatus = beatAccents[beatIndex] !== undefined ? beatAccents[beatIndex] : 1;
-
-            if (accentStatus === 0) return; // Muted beat
+            if (accentStatus === 0) return;
 
             const masterGain = audioCtx.createGain();
-            // Tunar volume option applies a x2 multiplier to gain (Dar um Grau)
             const effectiveVolume = volume * (volumeBoost ? 2.0 : 1.0);
             masterGain.gain.value = effectiveVolume;
             masterGain.connect(audioCtx.destination);
@@ -530,7 +958,6 @@
             osc.connect(noteGain);
             noteGain.connect(masterGain);
 
-            // Pitch & Sound synthesis according to preset
             if (soundPreset === 'digital') {
                 osc.type = 'sine';
                 if (isBeat1 && accentBeat1) {
@@ -640,19 +1067,15 @@
             const glowBackdrop = document.getElementById('glowBackdrop');
 
             if (isPlaying) {
-                playBtn.classList.remove('from-cyan-500', 'to-blue-600');
-                playBtn.classList.add('from-red-500', 'to-rose-600', 'shadow-rose-500/30', 'play-ring');
-                playIcon.className = 'fa-solid fa-square text-xl';
+                playBtn.classList.add('playing');
+                playIcon.innerHTML = `<rect x="5" y="5" width="14" height="14" rx="2"/>`;
                 playText.textContent = 'PARAR';
-                glowBackdrop.classList.remove('opacity-30');
-                glowBackdrop.classList.add('opacity-80');
+                glowBackdrop.style.opacity = '0.8';
             } else {
-                playBtn.classList.remove('from-red-500', 'to-rose-600', 'shadow-rose-500/30', 'play-ring');
-                playBtn.classList.add('from-cyan-500', 'to-blue-600');
-                playIcon.className = 'fa-solid fa-play text-xl';
+                playBtn.classList.remove('playing');
+                playIcon.innerHTML = `<polygon points="5 3 19 12 5 21 5 3"/>`;
                 playText.textContent = 'INICIAR';
-                glowBackdrop.classList.remove('opacity-80');
-                glowBackdrop.classList.add('opacity-30');
+                glowBackdrop.style.opacity = '0.3';
             }
         }
 
@@ -667,7 +1090,7 @@
             for (let i = 0; i < beatsPerMeasure; i++) {
                 const dot = document.createElement('button');
                 dot.id = `beat-dot-${i}`;
-                dot.className = 'beat-dot h-7 w-7 sm:h-9 sm:w-9 rounded-2xl flex items-center justify-center font-mono text-xs font-black transition-all bg-slate-800/80 border border-white/10 text-slate-400 hover:border-cyan-400';
+                dot.className = 'beat-dot';
                 dot.textContent = i + 1;
 
                 dot.onclick = () => {
@@ -682,16 +1105,12 @@
 
         function updateBeatDotStyle(dot, index) {
             const state = beatAccents[index];
-            dot.classList.remove('border-cyan-400', 'border-rose-400', 'text-cyan-300', 'text-slate-600', 'bg-cyan-950/40');
+            dot.classList.remove('beat-dot-accent', 'beat-dot-muted');
             
             if (state === 2) {
-                dot.classList.add('border-cyan-400', 'text-cyan-300', 'bg-cyan-950/40');
-                dot.title = `Tempo ${index + 1}: Acentuado`;
-            } else if (state === 1) {
-                dot.title = `Tempo ${index + 1}: Normal`;
-            } else {
-                dot.classList.add('text-slate-600', 'beat-dot-muted');
-                dot.title = `Tempo ${index + 1}: Mudo`;
+                dot.classList.add('beat-dot-accent');
+            } else if (state === 0) {
+                dot.classList.add('beat-dot-muted');
             }
         }
 
@@ -702,9 +1121,9 @@
 
                 if (i === beatIndex) {
                     const isBeat1 = (i === 0 && accentBeat1);
-                    dot.classList.add(isBeat1 ? 'accent-active' : 'normal-active', 'animate-beat-pop');
+                    dot.classList.add(isBeat1 ? 'accent-active' : 'normal-active');
                 } else {
-                    dot.classList.remove('accent-active', 'normal-active', 'animate-beat-pop');
+                    dot.classList.remove('accent-active', 'normal-active');
                 }
             }
         }
@@ -712,7 +1131,7 @@
         function resetBeatVisualizer() {
             for (let i = 0; i < beatsPerMeasure; i++) {
                 const dot = document.getElementById(`beat-dot-${i}`);
-                if (dot) dot.classList.remove('accent-active', 'normal-active', 'animate-beat-pop');
+                if (dot) dot.classList.remove('accent-active', 'normal-active');
             }
         }
 
@@ -722,7 +1141,7 @@
 
             if (setlist.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center py-6 text-slate-500 text-xs italic">
+                    <div style="text-align: center; padding: 20px; color: #64748b; font-size: 0.75rem; font-style: italic;">
                         Nenhum click salvo na lista. Clique em "+ Salvar Click Atual" acima!
                     </div>
                 `;
@@ -733,26 +1152,20 @@
                 const row = document.createElement('div');
                 const isActive = activeSongId === item.id;
 
-                row.className = `group flex items-center justify-between p-3 rounded-2xl border transition-all cursor-pointer ${
-                    isActive 
-                        ? 'bg-cyan-950/50 border-cyan-400/80 shadow-lg shadow-cyan-500/10' 
-                        : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/20'
-                }`;
+                row.className = `setlist-row ${isActive ? 'active' : ''}`;
 
                 row.innerHTML = `
-                    <div class="flex items-center gap-3 flex-1 min-w-0" onclick="selectAndPlayClick(${item.id})">
-                        <div class="w-8 h-8 rounded-xl ${isActive ? 'bg-cyan-500 text-darkBg' : 'bg-slate-800 text-cyan-400'} flex items-center justify-center font-bold text-xs flex-shrink-0">
-                            <i class="fa-solid ${isActive && isPlaying ? 'fa-volume-high animate-pulse' : 'fa-play'}"></i>
+                    <div class="setlist-info" onclick="selectAndPlayClick(${item.id})">
+                        <div class="setlist-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                         </div>
-                        <div class="truncate">
-                            <h4 class="text-xs font-bold ${isActive ? 'text-cyan-300' : 'text-slate-200'} truncate">${item.name}</h4>
-                            <p class="text-[10px] font-mono font-semibold ${isActive ? 'text-cyan-200/80' : 'text-slate-400'}">
-                                ${item.bpm} BPM · ${item.beatsPerMeasure}/${item.beatValue}
-                            </p>
+                        <div class="setlist-text">
+                            <div class="setlist-title">${item.name}</div>
+                            <div class="setlist-details">${item.bpm} BPM · ${item.beatsPerMeasure}/${item.beatValue}</div>
                         </div>
                     </div>
-                    <button onclick="removeSetlistItem(event, ${item.id})" class="glass-button w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border-transparent hover:border-rose-500/30 flex-shrink-0" title="Remover da lista">
-                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    <button onclick="removeSetlistItem(event, ${item.id})" class="glass-button" style="width: 32px; height: 32px; border: none; color: #94a3b8;" title="Remover da lista">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                     </button>
                 `;
 
@@ -766,7 +1179,6 @@
 
             activeSongId = item.id;
             
-            // Apply parameters
             bpm = item.bpm;
             beatsPerMeasure = item.beatsPerMeasure;
             beatValue = item.beatValue;
@@ -776,12 +1188,11 @@
             updateDisplay();
             renderSetlist();
 
-            // Enable Click immediately upon selecting song
             startClick();
         }
 
         function removeSetlistItem(event, id) {
-            event.stopPropagation(); // Avoid triggering selectAndPlayClick
+            event.stopPropagation();
             setlist = setlist.filter(item => item.id !== id);
             if (activeSongId === id) {
                 activeSongId = null;
@@ -792,25 +1203,15 @@
 
         function openAddSongModal() {
             const modal = document.getElementById('addSongModal');
-            const content = document.getElementById('addSongContent');
             const input = document.getElementById('songNameInput');
 
             input.value = `Música ${setlist.length + 1} - ${bpm} BPM (${beatsPerMeasure}/${beatValue})`;
-            
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            content.classList.remove('scale-95');
-            content.classList.add('scale-100');
-            
+            modal.classList.add('active');
             setTimeout(() => input.focus(), 150);
         }
 
         function closeAddSongModal() {
-            const modal = document.getElementById('addSongModal');
-            const content = document.getElementById('addSongContent');
-            
-            modal.classList.add('opacity-0', 'pointer-events-none');
-            content.classList.remove('scale-100');
-            content.classList.add('scale-95');
+            document.getElementById('addSongModal').classList.remove('active');
         }
 
         function saveCurrentClick() {
@@ -840,11 +1241,9 @@
             document.querySelectorAll('.ts-btn').forEach(btn => {
                 const key = `${beatsPerMeasure}/${beatValue}`;
                 if (btn.dataset.ts === key) {
-                    btn.classList.add('bg-cyan-500/20', 'border-cyan-400', 'text-cyan-300');
-                    btn.classList.remove('text-slate-300');
+                    btn.classList.add('active');
                 } else {
-                    btn.classList.remove('bg-cyan-500/20', 'border-cyan-400', 'text-cyan-300');
-                    btn.classList.add('text-slate-300');
+                    btn.classList.remove('active');
                 }
             });
 
@@ -890,28 +1289,18 @@
             }
 
             const tapBtn = document.getElementById('tapBtn');
-            tapBtn.classList.add('scale-95', 'bg-cyan-500/30');
-            setTimeout(() => tapBtn.classList.remove('scale-95', 'bg-cyan-500/30'), 100);
+            tapBtn.style.transform = 'scale(0.92)';
+            setTimeout(() => tapBtn.style.transform = 'none', 100);
         }
 
         function setupModal() {
             const modal = document.getElementById('settingsModal');
-            const modalContent = document.getElementById('settingsContent');
             const openBtn = document.getElementById('soundSettingsBtn');
             const closeBtn = document.getElementById('closeSettingsBtn');
             const saveBtn = document.getElementById('saveSettingsBtn');
 
-            const openModal = () => {
-                modal.classList.remove('opacity-0', 'pointer-events-none');
-                modalContent.classList.remove('scale-95');
-                modalContent.classList.add('scale-100');
-            };
-
-            const closeModal = () => {
-                modal.classList.add('opacity-0', 'pointer-events-none');
-                modalContent.classList.remove('scale-100');
-                modalContent.classList.add('scale-95');
-            };
+            const openModal = () => modal.classList.add('active');
+            const closeModal = () => modal.classList.remove('active');
 
             openBtn.onclick = openModal;
             closeBtn.onclick = closeModal;
@@ -959,7 +1348,6 @@
                 saveSettings();
             };
 
-            // Setup Add Song Modal Listeners
             document.getElementById('addClickBtn').onclick = openAddSongModal;
             document.getElementById('cancelAddSongBtn').onclick = closeAddSongModal;
             document.getElementById('confirmAddSongBtn').onclick = saveCurrentClick;
@@ -968,18 +1356,8 @@
             };
         }
 
-        function setupPWA() {
-            const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-                <rect width="512" height="512" rx="128" fill="#090d16"/>
-                <circle cx="256" cy="256" r="200" fill="#151e32" stroke="#06b6d4" stroke-width="12"/>
-                <path d="M256 100 L320 380 L192 380 Z" fill="#06b6d4"/>
-                <circle cx="256" cy="380" r="24" fill="#22d3ee"/>
-                <path d="M120 256 Q 256 180 392 256" stroke="#22d3ee" stroke-width="16" stroke-linecap="round"/>
-            </svg>`;
-
-            const iconBlob = new Blob([svgIcon], { type: 'image/svg+xml' });
-            const iconUrl = URL.createObjectURL(iconBlob);
-
+        function setupOfflinePWA() {
+            // Inline PWA Manifest Data URI
             const manifestObj = {
                 name: "Metrônomo Idall",
                 short_name: "Idall",
@@ -989,7 +1367,7 @@
                 theme_color: "#090d16",
                 icons: [
                     {
-                        src: iconUrl,
+                        src: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%23090d16'><rect width='512' height='512' rx='128'/><circle cx='256' cy='256' r='200' fill='%23151e32' stroke='%2306b6d4' stroke-width='12'/><path d='M256 100 L320 380 L192 380 Z' fill='%2306b6d4'/><circle cx='256' cy='380' r='24' fill='%2322d3ee'/></svg>",
                         sizes: "512x512",
                         type: "image/svg+xml",
                         purpose: "any maskable"
@@ -1004,46 +1382,50 @@
             link.href = manifestUrl;
             document.head.appendChild(link);
 
+            // Offline Service Worker with Instant Cache-First Reload Engine
             if ('serviceWorker' in navigator) {
                 const swScript = `
-                    const CACHE_NAME = 'metronomo-idall-v2';
+                    const CACHE_NAME = 'idall-offline-v1';
                     self.addEventListener('install', (e) => {
-                        e.waitUntil(
-                            caches.open(CACHE_NAME).then((cache) => {
-                                return cache.addAll(['./']);
-                            })
-                        );
                         self.skipWaiting();
+                    });
+                    self.addEventListener('activate', (e) => {
+                        e.waitUntil(clients.claim());
                     });
                     self.addEventListener('fetch', (e) => {
                         e.respondWith(
-                            caches.match(e.request).then((res) => res || fetch(e.request))
+                            caches.match(e.request).then((cached) => {
+                                if (cached) return cached;
+                                return fetch(e.request).then((networkRes) => {
+                                    if (e.request.method === 'GET') {
+                                        return caches.open(CACHE_NAME).then((cache) => {
+                                            cache.put(e.request, networkRes.clone());
+                                            return networkRes;
+                                        });
+                                    }
+                                    return networkRes;
+                                }).catch(() => cached || new Response('Offline', { status: 200 }));
+                            })
                         );
                     });
                 `;
                 const swBlob = new Blob([swScript], { type: 'text/javascript' });
                 const swUrl = URL.createObjectURL(swBlob);
 
-                navigator.serviceWorker.register(swUrl).then(() => {
-                    console.log('Metrônomo Idall: SW registrado.');
-                }).catch(err => console.log('SW Reg:', err));
+                navigator.serviceWorker.register(swUrl).catch(() => {});
             }
 
+            // PWA Installation prompt listener
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 deferredPrompt = e;
                 const pwaBtn = document.getElementById('pwaInstallBtn');
-                pwaBtn.classList.remove('hidden');
+                pwaBtn.style.display = 'inline-flex';
 
                 pwaBtn.onclick = () => {
-                    pwaBtn.classList.add('hidden');
+                    pwaBtn.style.display = 'none';
                     deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then((choiceResult) => {
-                        if (choiceResult.outcome === 'accepted') {
-                            console.log('App instalado!');
-                        }
-                        deferredPrompt = null;
-                    });
+                    deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
                 };
             });
         }
@@ -1062,11 +1444,13 @@
             muteBtn.addEventListener('click', () => {
                 isMuted = !isMuted;
                 if (isMuted) {
-                    muteIcon.className = 'fa-solid fa-volume-xmark text-red-400';
-                    muteBtn.classList.add('border-red-500/40');
+                    muteIcon.innerHTML = `<line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9L5 13H2v4h3l4 4V9z"/>`;
+                    muteBtn.style.borderColor = 'rgba(244, 63, 94, 0.4)';
+                    muteBtn.style.color = 'var(--rose-bright)';
                 } else {
-                    muteIcon.className = 'fa-solid fa-volume-high';
-                    muteBtn.classList.remove('border-red-500/40');
+                    muteIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>`;
+                    muteBtn.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                    muteBtn.style.color = '#e2e8f0';
                 }
             });
 
@@ -1081,7 +1465,7 @@
             renderSetlist();
             updateDisplay();
             setupModal();
-            setupPWA();
+            setupOfflinePWA();
         });
     </script>
 </body>
